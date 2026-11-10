@@ -1,0 +1,18 @@
+{
+  "name": "hiring-tracker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "discover": "node scripts/discover.mjs",
+    "snapshot": "node scripts/snapshot.mjs",
+    "metrics": "node scripts/metrics.mjs"
+  },
+  "dependencies": {
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
