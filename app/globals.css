@@ -32,7 +32,7 @@ body {
 }
 a { color: inherit; }
 
-.wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 16px; }
 @media (min-width: 768px) { .wrap { padding: 0 32px; } }
 
 .eyebrow, .label {
@@ -207,3 +207,296 @@ details p, details li { font-size: 16px; line-height: 1.5; color: var(--ink-2); 
 footer { padding-block: 40px 64px; color: var(--ink-3); font-size: 14px; line-height: 1.5; border-top: 1px solid var(--line); }
 .logo.initial { display: inline-grid; place-items: center; font-weight: 700; font-size: 15px; color: var(--ink-2); }
 .logo.initial.sm { font-size: 12px; }
+
+/* Chart labels and hover */
+.plot { position: relative; touch-action: pan-y; }
+.tip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 13px;
+  line-height: 1.35;
+  padding: 6px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+.tip b { font-weight: 700; }
+.axis-x {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-family: var(--font-condensed);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.chart text.axis-title { font-weight: 600; fill: var(--ink-2); }
+.mini-title { font-size: 11px; color: var(--ink-3); margin-bottom: -6px; }
+.spark { display: inline-block; width: 96px; }
+.spark.labeled { display: block; width: 100%; }
+.spark.labeled .plot { padding-top: 16px; }
+.spark svg { display: block; }
+.spark .peak {
+  position: absolute;
+  transform: translate(-50%, -2px);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.line .plot { margin-top: 18px; }
+.line svg { display: block; overflow: visible; }
+.line .dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8f4efe;
+  border: 2px solid var(--surface);
+  transform: translate(-50%, -50%);
+}
+.line .dot.live { background: var(--ink); }
+.line .dot.on { width: 12px; height: 12px; }
+.line .end-label {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 8px));
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.line .end-label.start { transform: translate(-4px, calc(-100% - 8px)); }
+.line .end-label.end { transform: translate(calc(-100% + 4px), calc(-100% - 8px)); }
+
+/* Section navigator: one connected shape attached to the left edge.
+   Two stacked lists share the same layout: `.secnav-blobs` draws the white
+   background through the goo filter, and `.secnav-items` holds the crisp text
+   and buttons on top. Distance classes d0 to d2 magnify rows like the Dock. */
+.secnav {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.42s;
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+.secnav-stack { position: relative; }
+.secnav ol {
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.secnav-blobs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  filter: url(#secnav-goo);
+  pointer-events: none;
+}
+.secnav-blobs .secnav-row { background: var(--surface); color: transparent; box-shadow: -40px 0 0 var(--surface); }
+.secnav-blobs::before,
+.secnav-blobs::after {
+  content: "";
+  position: absolute;
+  left: -40px;
+  width: 98px;
+  height: 12px;
+  background: var(--surface);
+}
+.secnav-blobs::before { top: 0; }
+.secnav-blobs::after { bottom: 0; }
+.secnav-items { position: relative; z-index: 2; }
+
+.secnav-row {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 30px 0fr;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px 0 16px;
+  cursor: pointer;
+  color: var(--ink-2);
+  transition:
+    grid-template-columns var(--dur) var(--ease-out),
+    height var(--dur) var(--ease-out),
+    padding var(--dur) var(--ease-out);
+}
+.secnav li.d2 .secnav-row { height: 37px; padding-right: 17px; }
+.secnav li.d1 .secnav-row { height: 41px; padding-right: 24px; }
+.secnav li.d0 .secnav-row { grid-template-columns: 30px 1fr; height: 46px; padding-right: 22px; }
+.secnav-items .secnav-row:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; border-radius: 10px; }
+
+.secnav-num {
+  justify-self: start;
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding: 4px 5px;
+  border-radius: 999px;
+  transform-origin: left center;
+  color: var(--ink-3);
+  transition: transform var(--dur) var(--ease-out), color 0.2s ease;
+}
+.secnav li.d2 .secnav-num { transform: scale(1.06); }
+.secnav li.d1 .secnav-num { transform: scale(1.12); }
+.secnav li.d0 .secnav-num { transform: scale(1.2); color: var(--ink); }
+/* Current section: black badge. Specific enough to beat the d0 color rule. */
+.secnav .secnav-items li .active .secnav-num { background: var(--ink); color: var(--bg); }
+/* The background layer only draws the white shape: hide all of its text, or
+   the goo filter blurs it into grey halos. */
+.secnav-blobs .secnav-row * { color: transparent !important; background: transparent !important; }
+
+.secnav-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0;
+  padding-left: 0;
+  transition: opacity 0.16s ease, padding-left var(--dur) var(--ease-out);
+}
+.secnav li.d0 .secnav-text { opacity: 1; padding-left: 10px; transition: opacity 0.28s ease 0.1s, padding-left var(--dur) var(--ease-out); }
+.secnav-title { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; color: var(--ink); }
+.secnav-meta { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+
+.secnav-progress {
+  position: absolute;
+  z-index: 1;
+  left: 6px;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.secnav-progress span { position: absolute; inset: 0; border-radius: 2px; background: var(--prism-text); transform: scaleY(0); transform-origin: top; will-change: transform; }
+.secnav-toggle { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .secnav-row, .secnav-num, .secnav-text, .secnav { transition: none !important; }
+}
+
+/* Narrow screens: a pill button opens the full list as a rounded panel. */
+@media (max-width: 1399px) {
+  .secnav {
+    top: auto;
+    bottom: 68px;
+    left: 16px;
+    transform: translateY(8px) scale(0.96);
+    transform-origin: bottom left;
+    opacity: 0;
+    visibility: hidden;
+    padding: 6px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 0 0 1px var(--line);
+    transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.35s;
+  }
+  .secnav.open { opacity: 1; visibility: visible; transform: none; }
+  .secnav .secnav-blobs, .secnav .secnav-progress { display: none; }
+  .secnav .secnav-items { padding: 0; align-items: stretch; }
+  .secnav .secnav-items li .secnav-row {
+    grid-template-columns: 30px 1fr;
+    height: 46px;
+    padding: 0 14px 0 10px;
+    border-radius: 14px;
+  }
+  .secnav .secnav-items li .secnav-num { transform: none; }
+  .secnav .secnav-items li .secnav-text { opacity: 1; padding-left: 8px; }
+  .secnav-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 21;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 0;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 0 0 1px var(--line);
+    cursor: pointer;
+    max-width: calc(100vw - 32px);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .secnav-toggle:active { transform: scale(0.96); }
+  .secnav-toggle .secnav-num { color: var(--ink-3); padding: 0; }
+}
+
+/* Wide screens: the navigator is a sidebar. Reserve a column as wide as its
+   widest expanded row (about 243px) so it never covers the content. */
+@media (min-width: 1400px) {
+  main { padding-left: 252px; }
+  main .wrap { padding-left: 24px; }
+}
+
+/* Custom dropdown in the chip style */
+.dd { position: relative; }
+.dd-button { display: inline-flex; align-items: center; gap: 8px; }
+.dd-button.set { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.dd-chevron { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.dd.open .dd-chevron { transform: rotate(180deg); }
+.dd-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 220px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px var(--line);
+  outline: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px) scale(0.97);
+  transform-origin: top left;
+  transition: opacity 0.16s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.3s;
+}
+.dd.open .dd-list { opacity: 1; visibility: visible; transform: none; }
+.dd-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+.dd-list li.cursor { background: var(--bg); color: var(--ink); }
+.dd-list li[aria-selected="true"] { font-weight: 700; color: var(--ink); }
+.dd-button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .dd-list, .dd-chevron { transition: none; }
+}
